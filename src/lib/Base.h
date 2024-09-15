@@ -106,6 +106,15 @@ void logit(const char* line, ...);
 
 #define ARRAY_COUNT(a) (sizeof(a) / sizeof(*(a)))
 
+// Prefixes
+// g for global
+// m for members
+// p for pointer
+// s for static (as in private)
+
+// Suffixes
+// t for typedef
+
 #include <stdbool.h>
 #include <stdint.h>
 typedef int8_t s8;
@@ -122,20 +131,5 @@ typedef s32 b32;
 typedef s64 b64;
 typedef float f32;
 typedef double f64;
-
-// Prefixes
-// g for global
-// m for members
-// p for pointer
-// s for static (as in private)
-
-// Suffixes
-// t for typedef
-
-// Math
-
-#define MATH_MIN(a, b) (((a) < (b)) ? (a) : (b))
-#define MATH_MAX(a, b) (((a) > (b)) ? (a) : (b))
-#define MATH_CLAMP(min, n, max) (((n) < (min)) ? (min) : ((max) < (n)) ? (max) : (n))
 
 #endif

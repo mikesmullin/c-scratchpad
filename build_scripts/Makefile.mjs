@@ -184,6 +184,8 @@ const compile = async (basename) => {
 
   // linker stage
   const executable = `${basename}${isWin ? '.exe' : ''} `;
+  const exePath = path.join(workspaceFolder, BUILD_PATH, executable);
+
   let code = 0;
   if (objs.length > 0) {
     code = await child_spawn(C_COMPILER_PATH, [
@@ -193,20 +195,28 @@ const compile = async (basename) => {
       ...LINKER_LIBS,
       ...LINKER_LIB_PATHS,
       ...dsts,
-      '-o', executable,
+      '-o', executable
     ]);
   }
   console.log("done compiling.");
 };
 
 const run = async (basename) => {
-  const executable = `${basename}${isWin ? '.exe' : ''} `;
+  const executable = `${basename}${isWin ? '.exe' : ''}`;
+  const exePath = path.join(workspaceFolder, BUILD_PATH, executable);
+  try {
+    await fs.stat(exePath);
+  } catch (e) {
+    console.log(JSON.stringify(exePath));
+    console.log(".exe is missing. probably failed to compile.", e);
+    return;
+  }
 
   if (isNix || isMac) {
     // chmod +x
-    await fs.chmod(path.join(workspaceFolder, BUILD_PATH, executable), 0o755);
+    await fs.chmod(exePath, 0o755);
   }
-  await child_spawn(path.join(workspaceFolder, BUILD_PATH, executable));
+  await child_spawn(exePath);
 }
 
 const watch = async () => {
