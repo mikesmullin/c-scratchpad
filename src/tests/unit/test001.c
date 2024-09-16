@@ -2,6 +2,7 @@
 
 #include "../../lib/Arena.h"
 #include "../../lib/Base.h"
+#include "../../lib/Hashmap.h"
 #include "../../lib/String.h"
 
 void Test001__Test() {
@@ -42,4 +43,27 @@ void Test002__Test() {
   sn1.next = &sn2;
 
   LOG_DEBUGF("%s%s", sn1.string->str, sn1.next->string->str);
+
+  Test003__Test();
+}
+
+void Test003__Test() {
+  HashMap* map = create_hashmap();
+
+  // Insert some key-value pairs
+  hashmap_insert(map, "name", "Alice");
+  hashmap_insert(map, "age", "30");
+  hashmap_insert(map, "city", "New York");
+
+  // Retrieve values
+  LOG_DEBUGF("Name: %s\n", hashmap_get(map, "name"));
+  LOG_DEBUGF("Age: %s\n", hashmap_get(map, "age"));
+  LOG_DEBUGF("City: %s\n", hashmap_get(map, "city"));
+
+  // Update an existing value
+  hashmap_insert(map, "city", "Los Angeles");
+  LOG_DEBUGF("Updated City: %s\n", hashmap_get(map, "city"));
+
+  // Free the hashmap
+  free_hashmap(map);
 }

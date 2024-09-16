@@ -3,5 +3,6 @@
 
 void Test001__Test();
 void Test002__Test();
+void Test003__Test();
 
 #endif  // TEST001_H
