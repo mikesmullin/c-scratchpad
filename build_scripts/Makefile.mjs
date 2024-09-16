@@ -207,7 +207,6 @@ const run = async (basename) => {
   try {
     await fs.stat(exePath);
   } catch (e) {
-    console.log(JSON.stringify(exePath));
     console.log(".exe is missing. probably failed to compile.", e);
     return;
   }
