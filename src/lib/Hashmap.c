@@ -19,9 +19,9 @@ unsigned int hash(const char* key) {
 // Create a new entry
 Entry* create_entry(const char* key, const char* value) {
   Entry* entry = malloc(sizeof(Entry));
-  entry->key = strdup(key);      // Duplicate the key
-  entry->value = strdup(value);  // Duplicate the value
-  entry->next = NULL;            // No collision yet
+  entry->key = _strdup(key);      // Duplicate the key
+  entry->value = _strdup(value);  // Duplicate the value
+  entry->next = NULL;             // No collision yet
   return entry;
 }
 
@@ -49,8 +49,8 @@ void hashmap_insert(HashMap* hashmap, const char* key, const char* value) {
     while (entry != NULL) {
       // If key already exists, update the value
       if (strcmp(entry->key, key) == 0) {
-        free(entry->value);            // Free old value
-        entry->value = strdup(value);  // Set new value
+        free(entry->value);             // Free old value
+        entry->value = _strdup(value);  // Set new value
         return;
       }
       prev = entry;
