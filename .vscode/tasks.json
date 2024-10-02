@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "type": "cppbuild",
+      "command": "clang",
+      "args": [
+        "-O0",
+        "-g",
+        "-m64",
+        "src/main.c",
+        "src/tests/unit/test001.c",
+        "src/lib/String.c",
+        "src/lib/Math.c",
+        "src/lib/Log.c",
+        "src/lib/Hashmap.c",
+        "src/lib/Arena.c",
+        "-o",
+        "build/main.exe"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+      },
+      "problemMatcher": "$gcc",
+      "group": "build"
+    }
+  ],
+}

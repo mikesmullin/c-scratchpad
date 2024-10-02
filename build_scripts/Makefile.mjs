@@ -24,7 +24,8 @@ const rel = (...args) =>
   path.relative(path.join(workspaceFolder, BUILD_PATH), path.join(...args));
 const DEBUG_COMPILER_ARGS = [
   '-O0',
-  '-gdwarf', // adds gdb support
+  //'-gdwarf', // adds gdb support
+  '-g', // windbg
   // TODO: do we need to pass `-debug` to the linker? `-Xlinker -debug`?
 ];
 const C_COMPILER_ARGS = [];
