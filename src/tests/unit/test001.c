@@ -6,12 +6,16 @@
 #include "../../lib/Base.h"
 #include "../../lib/Breakpoint.h"
 #include "../../lib/Log.h"
+//#include "../../lib/BehaviorTree.h"
 
 // Define return statuses for behavior tree nodes
 typedef enum { BT_SUCCESS, BT_FAILURE, BT_RUNNING } BTStatus;
 
 // Basic structure for a behavior tree node
 typedef struct BTNode {
+  // TODO: maybe easier to return void, and optionally edit node->state
+  // BTStatus state;
+  // TODO: use Dispatcher() fn pattern, rather than fn* (for hot-reload)
   BTStatus (*tick)(struct BTNode* node);  // Function pointer to the behavior's tick function
 } BTNode;
 
@@ -45,6 +49,7 @@ SelectorNode* CreateSelectorNode(BTNode** children, int count) {
 // -- PigEntity --
 
 // Pig's brain states
+// TODO: Only use BTStatus, otherwise use component state
 typedef enum { PIG_IDLE, PIG_PANIC, PIG_FOLLOW_LEADER } PigState;
 
 typedef struct {
@@ -103,6 +108,7 @@ BTStatus PigIdleTick(PigIdleNode* node) {
   // return BT_SUCCESS;  // We're the last node, so don't try to do anything else
 }
 
+// TODO: maybe easier to not define all the Create*() fns, and just manually init structs
 PigIdleNode* CreatePigIdleNode(Pig* pig) {
   PigIdleNode* node = malloc(sizeof(PigIdleNode));
   node->pig = pig;
