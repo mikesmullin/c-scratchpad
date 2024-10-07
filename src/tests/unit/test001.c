@@ -26,6 +26,7 @@ struct State {
   // TODO: event listeners can also transit state
   // TODO: Event instances contain closured/unique fn logic
   // Event events[];
+  // TODO: each state has its own Animator state, sending events, tracking anim frames, etc.
   // TODO: anim timers/onFrameN can also transit state (like Flash keyframes)
   // Timer timeline[];
   struct State* nextState;  // Next state to transition to
