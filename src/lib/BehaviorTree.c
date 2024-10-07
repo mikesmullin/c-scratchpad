@@ -3,14 +3,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-// Define return statuses for behavior tree nodes
-typedef enum { BT_SUCCESS, BT_FAILURE, BT_RUNNING } BTStatus;
-
-// Basic structure for a behavior tree node
-typedef struct BTNode {
-  BTStatus (*tick)(struct BTNode* node);  // Function pointer to the behavior's tick function
-} BTNode;
-
 // This set of nodes provides a wide variety of behaviors and
 // control flow for a behavior tree.
 
@@ -18,11 +10,6 @@ typedef struct BTNode {
 
 // This node is a basic node that wraps a single child,
 // primarily used for adding additional behavior to the child.
-
-typedef struct {
-  BTNode base;
-  BTNode* child;
-} DecoratorNode;
 
 BTStatus DecoratorTick(DecoratorNode* node) {
   return node->child->tick(node->child);  // Pass the tick to the child
@@ -39,11 +26,6 @@ DecoratorNode* CreateDecoratorNode(BTNode* child) {
 // 2. NotDecorator
 
 // This node inverts the result of its child (i.e., success becomes failure, and vice versa).
-
-typedef struct {
-  BTNode base;
-  BTNode* child;
-} NotDecorator;
 
 // TODO: Constructor arguments: name, child
 BTStatus NotDecoratorTick(NotDecorator* node) {
@@ -64,11 +46,6 @@ NotDecorator* CreateNotDecorator(BTNode* child) {
 
 // This node behaves like DecoratorNode but fails if its child is running.
 
-typedef struct {
-  BTNode base;
-  BTNode* child;
-} FailIfRunningDecorator;
-
 BTStatus FailIfRunningTick(FailIfRunningDecorator* node) {
   BTStatus status = node->child->tick(node->child);
   if (status == BT_RUNNING) return BT_FAILURE;
@@ -88,11 +65,6 @@ FailIfRunningDecorator* CreateFailIfRunningDecorator(BTNode* child) {
 // This node checks a condition function,
 // succeeding if the condition is true, and failing otherwise.
 
-typedef struct {
-  BTNode base;
-  bool (*condition)();
-} ConditionNode;
-
 BTStatus ConditionTick(ConditionNode* node) {
   return node->condition() ? BT_SUCCESS : BT_FAILURE;
 }
@@ -111,11 +83,6 @@ ConditionNode* CreateConditionNode(bool (*condition)()) {
 // It's similar to ConditionNode, but it returns BT_RUNNING
 // instead of BT_FAILURE when the condition is false.
 
-typedef struct {
-  BTNode base;
-  bool (*condition)();
-} ConditionWaitNode;
-
 BTStatus ConditionWaitTick(ConditionWaitNode* node) {
   return node->condition() ? BT_SUCCESS : BT_RUNNING;
 }
@@ -131,11 +98,6 @@ ConditionWaitNode* CreateConditionWaitNode(bool (*condition)()) {
 // 6. ActionNode
 
 // This node executes an action and always succeeds after running it.
-
-typedef struct {
-  BTNode base;
-  void (*action)();
-} ActionNode;
 
 BTStatus ActionTick(ActionNode* node) {
   node->action();  // Run the action
@@ -153,14 +115,6 @@ ActionNode* CreateActionNode(void (*action)()) {
 // 7. WaitNode
 
 // This node waits for a specified amount of time before succeeding.
-
-#include <time.h>
-
-typedef struct {
-  BTNode base;
-  double waitTime;
-  time_t startTime;
-} WaitNode;
 
 BTStatus WaitTick(WaitNode* node) {
   time_t currentTime = time(NULL);
@@ -181,13 +135,6 @@ WaitNode* CreateWaitNode(double timeInSeconds) {
 // 8. SequenceNode
 
 // This node goes through its children in order, succeeding if all succeed.
-
-typedef struct {
-  BTNode base;
-  BTNode** children;
-  int childCount;
-  int currentChild;
-} SequenceNode;
 
 BTStatus SequenceTick(SequenceNode* node) {
   while (node->currentChild < node->childCount) {
@@ -214,13 +161,6 @@ SequenceNode* CreateSequenceNode(BTNode** children, int count) {
 // This node is similar to SequenceNode but succeeds
 // as soon as one child succeeds.
 
-typedef struct {
-  BTNode base;
-  BTNode** children;
-  int childCount;
-  int currentChild;
-} SelectorNode;
-
 BTStatus SelectorTick(SelectorNode* node) {
   while (node->currentChild < node->childCount) {
     BTStatus status = node->children[node->currentChild]->tick(node->children[node->currentChild]);
@@ -243,15 +183,6 @@ SelectorNode* CreateSelectorNode(BTNode** children, int count) {
 // 10. LoopNode
 
 // This node runs its children multiple times (up to maxreps).
-
-typedef struct {
-  BTNode base;
-  BTNode** children;
-  int childCount;
-  int maxReps;
-  int currentRep;
-  int currentChild;
-} LoopNode;
 
 BTStatus LoopTick(LoopNode* node) {
   while (node->currentRep < node->maxReps) {
@@ -283,13 +214,6 @@ LoopNode* CreateLoopNode(BTNode** children, int count, int maxReps) {
 // The RandomNode picks a random child to execute.
 // If it fails, it will try the next child
 // until all children have been executed.
-
-typedef struct {
-  BTNode base;
-  BTNode** children;
-  int childCount;
-  int currentChild;
-} RandomNode;
 
 BTStatus RandomTick(RandomNode* node) {
   // If all children have been tried, reset currentChild
@@ -327,12 +251,6 @@ RandomNode* CreateRandomNode(BTNode** children, int count) {
 // succeeds if all children complete successfully.
 // It fails if any child fails.
 
-typedef struct {
-  BTNode base;
-  BTNode** children;
-  int childCount;
-} ParallelNode;
-
 BTStatus ParallelTick(ParallelNode* node) {
   bool anyRunning = false;
 
@@ -362,12 +280,6 @@ ParallelNode* CreateParallelNode(BTNode** children, int count) {
 
 // The ParallelNodeAny is similar to ParallelNode,
 // but it succeeds if any child stops running without failing.
-
-typedef struct {
-  BTNode base;
-  BTNode** children;
-  int childCount;
-} ParallelNodeAny;
 
 BTStatus ParallelAnyTick(ParallelNodeAny* node) {
   bool anyRunning = false;
@@ -399,12 +311,6 @@ ParallelNodeAny* CreateParallelNodeAny(BTNode** children, int count) {
 // The IfNode checks a condition before executing its child node.
 // If the condition is true, it runs the child.
 
-typedef struct {
-  BTNode base;
-  bool (*condition)();
-  BTNode* child;
-} IfNode;
-
 BTStatus IfTick(IfNode* node) {
   if (node->condition()) {
     return node->child->tick(node->child);  // Tick the child if condition is true
@@ -431,15 +337,6 @@ IfNode* CreateIfNode(bool (*condition)(), BTNode* child) {
 // creating a cooldown effect before the next execution.
 
 // TODO: add Sleep() method which can accumulate (+=) parent priorityNode period
-
-typedef struct {
-  BTNode base;
-  BTNode** children;
-  int childCount;
-  float period;
-  float lastExecutionTime;
-  float currentTime;  // Current time for the node (should be updated externally)
-} PriorityNode;
 
 BTStatus PriorityTick(PriorityNode* node) {
   // Check if the period has passed since the last execution
@@ -481,12 +378,6 @@ PriorityNode* CreatePriorityNode(BTNode** children, int count, float period) {
 // WhileNode allows for repeated execution of a child node
 // based on a dynamic condition, making it useful for
 // looping behaviors until a condition changes.
-
-typedef struct {
-  BTNode base;
-  bool (*condition)();
-  BTNode* child;
-} WhileNode;
 
 BTStatus WhileTick(WhileNode* node) {
   if (node->condition()) {
