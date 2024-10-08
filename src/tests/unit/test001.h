@@ -1,3 +1,3 @@
 #pragma once
 
-void Test__Boot();
+void Test001__Test();

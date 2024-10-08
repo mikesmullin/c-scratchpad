@@ -39,31 +39,32 @@ struct StateGraph {
 };
 
 // Function prototypes for state functions
-void idleoutEnter(StateGraph* sg);
-void idleoutUpdate(StateGraph* sg);
-void idleoutExit(StateGraph* sg);
-void idleinEnter(StateGraph* sg);
-void idleinUpdate(StateGraph* sg);
-void idleinExit(StateGraph* sg);
-void emergeEnter(StateGraph* sg);
-void emergeUpdate(StateGraph* sg);
-void emergeExit(StateGraph* sg);
-void hibernateEnter(StateGraph* sg);
-void hibernateUpdate(StateGraph* sg);
-void hibernateExit(StateGraph* sg);
+static void idleoutEnter(StateGraph* sg);
+static void idleoutUpdate(StateGraph* sg);
+static void idleoutExit(StateGraph* sg);
+static void idleinEnter(StateGraph* sg);
+static void idleinUpdate(StateGraph* sg);
+static void idleinExit(StateGraph* sg);
+static void emergeEnter(StateGraph* sg);
+static void emergeUpdate(StateGraph* sg);
+static void emergeExit(StateGraph* sg);
+static void hibernateEnter(StateGraph* sg);
+static void hibernateUpdate(StateGraph* sg);
+static void hibernateExit(StateGraph* sg);
 
 // Define states
-State idleoutState, idleinState, emergeState, hibernateState;
+static State idleoutState, idleinState, emergeState, hibernateState;
 
 // State definitions with transitions
-State idleoutState = {"IdleOut", idleoutEnter, idleoutUpdate, idleoutExit, &hibernateState};
-State idleinState = {"IdleIn", idleinEnter, idleinUpdate, idleinExit, &emergeState};
-State emergeState = {"Emerge", emergeEnter, emergeUpdate, emergeExit, &idleinState};
-State hibernateState = {"Hibernate", hibernateEnter, hibernateUpdate, hibernateExit, &idleoutState};
+static State idleoutState = {"IdleOut", idleoutEnter, idleoutUpdate, idleoutExit, &hibernateState};
+static State idleinState = {"IdleIn", idleinEnter, idleinUpdate, idleinExit, &emergeState};
+static State emergeState = {"Emerge", emergeEnter, emergeUpdate, emergeExit, &idleinState};
+static State hibernateState = {
+    "Hibernate", hibernateEnter, hibernateUpdate, hibernateExit, &idleoutState};
 
 // StateGraph initialization
 // TODO: accept params like (name, states, events, initialState)
-StateGraph* createStateGraph() {
+static StateGraph* createStateGraph() {
   StateGraph* sg = (StateGraph*)malloc(sizeof(StateGraph));
   sg->currentState = &idleoutState;  // Start in the idleout state
   sg->currentEvent = EVENT_NONE;  // No event initially
@@ -71,12 +72,12 @@ StateGraph* createStateGraph() {
 }
 
 // Event handling functions
-void sendEvent(StateGraph* sg, EventType event) {
+static void sendEvent(StateGraph* sg, EventType event) {
   sg->currentEvent = event;
 }
 
 // Check for specific events and handle state transitions
-void handleEvents(StateGraph* sg) {
+static void handleEvents(StateGraph* sg) {
   switch (sg->currentEvent) {
     case EVENT_DEATH:
       printf("Handled 'death' event.\n");
@@ -106,11 +107,11 @@ void handleEvents(StateGraph* sg) {
 }
 
 // State functions implementation
-void idleoutEnter(StateGraph* sg) {
+static void idleoutEnter(StateGraph* sg) {
   printf("Entering IdleOut State.\n");
 }
 
-void idleoutUpdate(StateGraph* sg) {
+static void idleoutUpdate(StateGraph* sg) {
   printf("Update IdleOut State.\n");
   // For this example, after one update, we'll simulate animation over
 
@@ -121,15 +122,15 @@ void idleoutUpdate(StateGraph* sg) {
   // TODO: but states can trigger other (incl. custom events) (ie. "freshspawn")
 }
 
-void idleoutExit(StateGraph* sg) {
+static void idleoutExit(StateGraph* sg) {
   printf("Exiting IdleOut State.\n");
 }
 
-void idleinEnter(StateGraph* sg) {
+static void idleinEnter(StateGraph* sg) {
   printf("Entering IdleIn State.\n");
 }
 
-void idleinUpdate(StateGraph* sg) {
+static void idleinUpdate(StateGraph* sg) {
   printf("Update IdleIn State.\n");
   if (rand() % 10 < 2) {  // 20% chance to be attacked
     sendEvent(sg, EVENT_ATTACKED);
@@ -138,40 +139,40 @@ void idleinUpdate(StateGraph* sg) {
   }
 }
 
-void idleinExit(StateGraph* sg) {
+static void idleinExit(StateGraph* sg) {
   printf("Exiting IdleIn State.\n");
 }
 
-void emergeEnter(StateGraph* sg) {
+static void emergeEnter(StateGraph* sg) {
   printf("Entering Emerge State.\n");
 }
 
-void emergeUpdate(StateGraph* sg) {
+static void emergeUpdate(StateGraph* sg) {
   printf("Update Emerge State.\n");
   sendEvent(sg, EVENT_ANIMOVER);  // After emerge, transition to idlein
 }
 
-void emergeExit(StateGraph* sg) {
+static void emergeExit(StateGraph* sg) {
   printf("Exiting Emerge State.\n");
 }
 
-void hibernateEnter(StateGraph* sg) {
+static void hibernateEnter(StateGraph* sg) {
   printf("Entering Hibernate State.\n");
 }
 
-void hibernateUpdate(StateGraph* sg) {
+static void hibernateUpdate(StateGraph* sg) {
   printf("Update Hibernate State.\n");
   if (rand() % 10 < 3) {  // 30% chance to come out of hibernation
     sendEvent(sg, EVENT_ANIMOVER);
   }
 }
 
-void hibernateExit(StateGraph* sg) {
+static void hibernateExit(StateGraph* sg) {
   printf("Exiting Hibernate State.\n");
 }
 
 // Main simulation loop
-void runStateGraph(StateGraph* sg) {
+static void runStateGraph(StateGraph* sg) {
   for (int i = 0; i < 20; i++) {
     printf("--TICK %d--\n", i);
     sg->currentState->onUpdate(sg);
@@ -179,7 +180,7 @@ void runStateGraph(StateGraph* sg) {
   }
 }
 
-static void Test001__Test() {
+void Test001__Test() {
   LOG_DEBUGF("Test001 StateGraph System Demo");
   StateGraph* sg = createStateGraph();
   sg->currentState->onEnter(sg);  // Enter the initial state
@@ -189,8 +190,4 @@ static void Test001__Test() {
 
   // Free allocated memory
   free(sg);
-}
-
-void Test__Boot() {
-  Test001__Test();
 }

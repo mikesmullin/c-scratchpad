@@ -4,6 +4,7 @@
 #include <time.h>
 
 // Define return statuses for behavior tree nodes
+// TODO: add BT_READY state?
 typedef enum { BT_SUCCESS, BT_FAILURE, BT_RUNNING } BTStatus;
 
 // Basic structure for a behavior tree node

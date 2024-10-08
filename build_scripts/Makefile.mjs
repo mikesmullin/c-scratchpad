@@ -221,7 +221,7 @@ const run = async (basename) => {
 
 const watch = async () => {
   console.log(`watching...`);
-  const watcher = fs.watch(path.join(workspaceFolder, 'src', 'tests', 'unit', 'test001.c'));
+  const watcher = fs.watch(path.join(workspaceFolder, 'src', 'tests', 'unit'));
   let timer;
   let wait = false;
   for await (const event of watcher) {

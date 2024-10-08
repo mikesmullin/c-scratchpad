@@ -1,10 +1,10 @@
-#include <math.h>
+#include "test002.h"
+
 #include <stdio.h>
 
 #include "../../lib/Base.h"
 #include "../../lib/BehaviorTree.h"
 #include "../../lib/Breakpoint.h"
-#include "../../lib/Log.h"
 
 // -- PigEntity --
 
@@ -57,7 +57,7 @@ typedef struct {
   Pig* pig;
 } PigIdleNode;
 
-BTStatus PigIdleTick(PigIdleNode* node) {
+static BTStatus PigIdleTick(PigIdleNode* node) {
   Pig* pig = node->pig;
   // printf("Pig is considering idling...\n");
   // if (!pig->isThreatNear) {
@@ -69,7 +69,7 @@ BTStatus PigIdleTick(PigIdleNode* node) {
 }
 
 // TODO: maybe easier to not define all the Create*() fns, and just manually init structs
-PigIdleNode* CreatePigIdleNode(Pig* pig) {
+static PigIdleNode* CreatePigIdleNode(Pig* pig) {
   PigIdleNode* node = malloc(sizeof(PigIdleNode));
   node->pig = pig;
   node->base.tick = (BTStatus(*)(BTNode*))PigIdleTick;
@@ -82,7 +82,7 @@ typedef struct {
   Pig* pig;
 } PigPanicNode;
 
-BTStatus PigPanicTick(PigPanicNode* node) {
+static BTStatus PigPanicTick(PigPanicNode* node) {
   Pig* pig = node->pig;
   printf("Pig is thinking about panicking...\n");
   if (pig->isThreatNear) {
@@ -93,7 +93,7 @@ BTStatus PigPanicTick(PigPanicNode* node) {
   return BT_FAILURE;  // Do other things if the threat is gone
 }
 
-PigPanicNode* CreatePigPanicNode(Pig* pig) {
+static PigPanicNode* CreatePigPanicNode(Pig* pig) {
   PigPanicNode* node = malloc(sizeof(PigPanicNode));
   node->pig = pig;
   node->base.tick = (BTStatus(*)(BTNode*))PigPanicTick;
@@ -106,7 +106,7 @@ typedef struct {
   Pig* pig;
 } PigFollowLeaderNode;
 
-BTStatus PigFollowLeaderTick(PigFollowLeaderNode* node) {
+static BTStatus PigFollowLeaderTick(PigFollowLeaderNode* node) {
   Pig* pig = node->pig;
   printf("Pig is considering following a leader...\n");
   if (pig->isLeaderNear) {
@@ -117,7 +117,7 @@ BTStatus PigFollowLeaderTick(PigFollowLeaderNode* node) {
   return BT_FAILURE;  // Pick a new action, while leader is gone
 }
 
-PigFollowLeaderNode* CreatePigFollowLeaderNode(Pig* pig) {
+static PigFollowLeaderNode* CreatePigFollowLeaderNode(Pig* pig) {
   PigFollowLeaderNode* node = malloc(sizeof(PigFollowLeaderNode));
   node->pig = pig;
   node->base.tick = (BTStatus(*)(BTNode*))PigFollowLeaderTick;
@@ -126,7 +126,7 @@ PigFollowLeaderNode* CreatePigFollowLeaderNode(Pig* pig) {
 // #metaend
 
 // Simulate the Behavior Tree running for the pig
-void RunPigBrain(Pig* pig) {
+static void RunPigBrain(Pig* pig) {
   // Create leaf nodes for each behavior
   PigIdleNode* idle = CreatePigIdleNode(pig);
   PigPanicNode* panic = CreatePigPanicNode(pig);
@@ -161,7 +161,7 @@ void RunPigBrain(Pig* pig) {
   free(root);
 }
 
-static void Test002__Test() {
+void Test002__Test() {
   LOG_DEBUGF("Test002 BehaviorTree System Demo");
   Pig pig = {PIG_IDLE, false, false};  // Initialize pig with default state (idle)
   RunPigBrain(&pig);  // Run the Pig's brain using the behavior tree
