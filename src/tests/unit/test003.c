@@ -24,7 +24,7 @@ typedef struct {
 static bool Block__OnHello(void* self, void* data);
 static bool Entity__OnHello(void* self, void* data);
 static bool CatEntity__OnGoodbye(void* self, void* data);
-static bool (*VTABLE_LISTENERS[LISTENER_FN_COUNT])() = {
+static bool (*VTABLE_LISTENERS[LISTENER_FN_COUNT])(void* self, void* data) = {
     Block__OnHello,  // BLOCK__HELLO
     Entity__OnHello,  // ENTITY__HELLO
     CatEntity__OnGoodbye  // CAT_ENTITY__GOODBYE
@@ -61,6 +61,7 @@ static void EventEmitter__on(EventEmitter_t* emitter, EventType event, ListenerF
 }
 
 // Emit an event using the listener enum dispatch
+// TODO: pass vtable here
 static void EventEmitter__emit(EventEmitter_t* emitter, EventType event, void* self, void* data) {
   for (int i = 0; i < emitter->count; i++) {
     EventType e = emitter->event[i];

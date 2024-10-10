@@ -1,12 +1,17 @@
 #include "Arena.h"
 
-Arena_t Arena__Alloc(u64 sz) {
+#include <stdlib.h>
+
+#include "Log.h"
+
+void Arena__Alloc(Arena_t* a, u64 sz) {
   // LOG_DEBUGF("arena malloc %llu", sz);
   void* p = malloc(sz);
   // LOG_DEBUGF("arena p %p", p);
   ASSERT_CONTEXT(NULL != p, "Arena malloc request rejected by OS.");
-  Arena_t a = {.buf = p, .pos = p, .end = p + sz};
-  return a;
+  a->buf = p;
+  a->pos = p;
+  a->end = p + sz;
 }
 
 Arena_t* Arena__SubAlloc(Arena_t* a, u64 sz) {
