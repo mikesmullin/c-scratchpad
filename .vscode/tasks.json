@@ -9,6 +9,7 @@
         "-O0",
         "-g",
         "-m64",
+        "-L Ws2_32.lib",
         "src/main.c",
         "src/tests/unit/test001.c",
         "src/tests/unit/test002.c",
@@ -20,15 +21,17 @@
         "src/lib/List.c",
         "src/lib/Log.c",
         "src/lib/Math.c",
+        "src/lib/Net.c",
         "src/lib/String.c",
+        "src/lib/Time.c",
         "-o",
         "build/main.exe"
       ],
       "options": {
         "cwd": "${workspaceFolder}",
       },
-      "problemMatcher": "$gcc",
       "group": "build",
+      //"problemMatcher": "$gcc", // better to leave it off and let clangd update vscode problems list
       "presentation": {
         "echo": false,
         "reveal": "silent",

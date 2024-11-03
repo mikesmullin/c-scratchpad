@@ -1,0 +1,15 @@
+Test004 Network Client + Server
+Server listen on 0.0.0.0:9000
+Client connecting to 127.0.0.1:9000
+Client connected to 127.0.0.1:9000
+Client send. len: 6, data: chello
+Server 0.0.0.0:9000 accept 127.0.0.1:59429
+Server send. len: 6, data: shello
+Server recv. len: 6, data: chello
+server satisfied
+Client recv. len: 6, data: shello
+client satisfied
+close client 1a
+close accepted 1b
+close server
+shutdown
