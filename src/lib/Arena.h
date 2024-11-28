@@ -1,20 +1,17 @@
-#ifndef ARENA_H
-#define ARENA_H
+#pragma once
 
 #include <stdint.h>
 typedef uint64_t u64;
 
 // Arena/Linear/Bump allocator
-typedef struct Arena_t {
+typedef struct Arena {
   void* buf;
   void* pos;
   void* end;
-} Arena_t;
+} Arena;
 
-void Arena__Alloc(Arena_t* a, u64 sz);
-Arena_t* Arena__SubAlloc(Arena_t* a, u64 sz);
-void* Arena__Push(Arena_t* a, u64 sz);
-void Arena__Free(Arena_t* a);
-void Arena__Reset(Arena_t* a);
-
-#endif  // ARENA_H
+void Arena__Alloc(Arena** a, u64 sz);
+Arena* Arena__SubAlloc(Arena* a, u64 sz);
+void* Arena__Push(Arena* a, u64 sz);
+void Arena__Free(Arena* a);
+void Arena__Reset(Arena* a);

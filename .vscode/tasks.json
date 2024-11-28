@@ -3,7 +3,7 @@
   "tasks": [
     {
       "label": "build",
-      "type": "cppbuild",
+      "type": "shell",
       "command": "clang",
       "args": [
         "-O0",
@@ -15,13 +15,16 @@
         "src/tests/unit/test002.c",
         "src/tests/unit/test003.c",
         "src/tests/unit/test004.c",
+        "src/tests/unit/test005.c",
         "src/lib/Arena.c",
+        "src/lib/Base64.c",
         "src/lib/BehaviorTree.c",
         "src/lib/Hashmap.c",
         "src/lib/List.c",
         "src/lib/Log.c",
         "src/lib/Math.c",
         "src/lib/Net.c",
+        "src/lib/Sha1.c",
         "src/lib/String.c",
         "src/lib/Time.c",
         "-o",

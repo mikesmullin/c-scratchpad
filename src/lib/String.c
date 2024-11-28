@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-String8* str8_alloc(Arena_t* a, const char* str) {
+String8* str8_alloc(Arena* a, const char* str) {
   u64 len = strlen(str) + 1;
   void* p = Arena__Push(a, len);
   memcpy(p, str, len);
@@ -22,7 +22,7 @@ void str8__fputs(String8Node* s, FILE* stream) {
   fputs("\n", stream);
 }
 
-String8Node* str8n__allocf(Arena_t* a, String8Node* first, const char* format, u32 len, ...) {
+String8Node* str8n__allocf(Arena* a, String8Node* first, const char* format, u32 len, ...) {
   void* p = Arena__Push(a, len);  // c_str
 
   va_list args;
