@@ -23,6 +23,7 @@
         "src/lib/List.c",
         "src/lib/Log.c",
         "src/lib/Math.c",
+        "src/lib/Math2.c",
         "src/lib/Net.c",
         "src/lib/Sha1.c",
         "src/lib/String.c",
@@ -37,11 +38,11 @@
       //"problemMatcher": "$gcc", // better to leave it off and let clangd update vscode problems list
       "presentation": {
         "echo": false,
-        "reveal": "silent",
+        "reveal": "always",
         "focus": false,
         "panel": "shared",
         "showReuseMessage": false,
-        "clear": false
+        "clear": true
       }
     }
   ]

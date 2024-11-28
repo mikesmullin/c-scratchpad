@@ -1,38 +1,65 @@
 #include "test005.h"
 
-#include <stdio.h>
+#include <math.h>
 
-#include "../../lib/Arena.h"
 #include "../../lib/Base.h"
-#include "../../lib/Base64.h"
-#include "../../lib/Sha1.h"
-
-static const char* WS_HANDSHAKE_MAGIC = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+#include "../../lib/Math2.h"
 
 void Test005__Test() {
-  LOG_DEBUGF("Test005 Base64");
+  LOG_DEBUGF("Test005 Math2");
 
-  char* key = "piuY/sopTtheQIVA3jM4vQ==";
+  v3 a = {1.0f, 2.0f, 3.0f};
+  v3 b = v3_cp(&a);
+  a.x = 4;
+  ASSERT(b.x == 1);
 
-  // Concatenate the client's Sec-WebSocket-Key with the magic string
-  char a[256];
-  sprintf(a, "%s%s", key, WS_HANDSHAKE_MAGIC);
+  f32 c = v3_dot(&b, &a);
+  ASSERT(c == 17.0f);
 
-  // Compute the SHA-1 hash of this concatenated string
-  u8 hash[20];
-  sha1(hash, (const u8*)a, strlen(a));
+  f32 d = v3_len2(&b);
+  ASSERT(d == 14.0f);
 
-  Arena* arena;
-  Arena__Alloc(&arena, 1024);
+  f32 e = v3_len(&b);
+  // ASSERT(e == 3.74165750f); // math.h
+  ASSERT(e == 3.74165726f);  // approx (7-digit accuracy)
 
-  // Base64 encode the result of the hash
-  char* encoded = base64_encode(arena, (const unsigned char*)hash, 20);
+  f32 f2 = Math__sinf(1.23f);
+  // ASSERT(f1 == 0.942488790f);  // math.h
+  ASSERT(f2 == 0.942488849f);  // approx (7-digit accuracy)
 
-  printf(  // TODO: use mprintf()
-      "HTTP/1.1 101 Switching Protocols\r\n"
-      "Upgrade: websocket\r\n"
-      "Connection: Upgrade\r\n"
-      "Sec-WebSocket-Accept: %s\r\n"
-      "Sec-WebSocket-Extensions: permessage-deflate\r\n\r\n",
-      encoded);
+  f2 = Math__cosf(1.23f);
+  // ASSERT(f1 == 0.334237695f);  // math.h
+  ASSERT(f2 == 0.334237754f);  // approx (7-digit accuracy)
+
+  f2 = Math__tanf(1.23f);
+  // ASSERT(f1 == 2.81981587f);  // math.h
+  ASSERT(f2 == 2.81981587f);  // approx (7-digit accuracy)
+
+  f2 = Math__atanf(1.23f);
+  // ASSERT(f1 == 0.888173759f);  // math.h
+  ASSERT(f2 == 0.888173759f);  // approx (6-digit accuracy)
+
+  f2 = Math__atan2f(1.23f, 1.45f);
+  // ASSERT(f1 == 0.703492224f);  // math.h
+  ASSERT(f2 == 0.703492284f);  // approx (6-digit accuracy)
+
+  u64 seed = 8008135ULL, prng1 = seed;
+  f32 r = Math__randomf(0.0f, 10.0f, &prng1);
+  ASSERT(r == 1.25978529f);
+  ASSERT(prng1 == 11400714819331206620ULL);
+
+  r = Math__randomf(0.0f, 10.0f, &prng1);
+  ASSERT(r == 4.78351068f);
+  ASSERT(prng1 == 4354685564944853489ULL);
+
+  u32 u = Math__ceil(1.23f);
+  ASSERT(u == 2);
+
+  u = Math__floor(1.23f);
+  ASSERT(u == 1);
+
+  f32 f1 = acosf(0.23f);
+  f2 = Math__acosf(0.23f);
+  ASSERT(f1 == 1.33871865f);
+  ASSERT(f2 == 1.33874631f);
 }
