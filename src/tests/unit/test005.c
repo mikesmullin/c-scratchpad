@@ -16,10 +16,10 @@ void Test005__Test() {
   f32 c = v3_dot(&b, &a);
   ASSERT(c == 17.0f);
 
-  f32 d = v3_len2(&b);
+  f32 d = v3_mag2(&b);
   ASSERT(d == 14.0f);
 
-  f32 e = v3_len(&b);
+  f32 e = v3_mag(&b);
   // ASSERT(e == 3.74165750f); // math.h
   ASSERT(e == 3.74165726f);  // approx (7-digit accuracy)
 
@@ -62,4 +62,16 @@ void Test005__Test() {
   f2 = Math__acosf(0.23f);
   ASSERT(f1 == 1.33871865f);
   ASSERT(f2 == 1.33874631f);
+
+  v3* a1 = &(v3){1, 2, 3};
+  v3* a2 = &(v3){4, 5, 6};
+  f2 = v3_dot(a1, a2);
+  ASSERT(f2 == 32.0f);
+
+  m4 p1;
+  m4_perspective(&p1, 45.0f, 1.0f, 0.1f, 100.0f);
+  ASSERT(p1.a.x == 1.79259121f);
+  ASSERT(p1.a.y == 0.0f);
+  ASSERT(p1.a.z == 0.0f);
+  ASSERT(p1.a.w == 0.0f);
 }

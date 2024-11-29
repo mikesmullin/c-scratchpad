@@ -44,14 +44,11 @@ f32 Math__fmodf(f32 n, f32 d) {
   return n - (f32)w * d;  // calculate the remainder
 }
 
-f32 Math__rclampf(f32 min, f32 n, f32 max, f32 step) {
-  while (n <= min) {
-    n += step;
-  }
-  while (n >= max) {
-    n -= step;
-  }
-  return n;
+// wrap-around: clamps x to range [n,m] inclusive by step s
+f32 Math__wrapaf(f32 n, f32 x, f32 m, f32 s) {
+  while (x < n) x += s;
+  while (x > m) x -= s;
+  return x;
 }
 
 // 6-digit approx
@@ -96,14 +93,6 @@ u32 Math__floor(f32 n) {
     return i - 1;
   }
   return i;
-}
-
-f32 Math__fabsf(f32 x) {
-  return (x < 0.0f) ? -x : x;
-}
-
-f32 Math__pow4(f32 n) {
-  return n * n * n * n;
 }
 
 static f64 _cos(f64 x) {
@@ -297,35 +286,114 @@ f32 Math__randomf(f32 min, f32 max, u64* state) {
   return min + normalized * (max - min);
 }
 
-f32 lerp(f32 v0, f32 v1, f32 t) {
-  return (1 - t) * v0 + t * v1;
+// normalize
+
+void v1_norm(const v1* a, v1* dst) {
+  f32 len = v1_mag(a);
+  if (len > 0.0f) {
+    dst->x /= len;
+  }
 }
 
-// // spherical linear interpolation between two vectors
-// v3 slerp(v3 v0, v3 v1, f32 t) {
-//   // Normalize the input vectors
-//   v0 = v3_norm(&v0);
-//   v1 = v3_norm(&v1);
+void v2_norm(const v2* a, v2* dst) {
+  f32 len = v2_mag(a);
+  if (len > 0.0f) {
+    dst->x /= len;
+    dst->y /= len;
+  }
+}
 
-//   // Compute the dot product
-//   f32 dotProduct = v3_dot(v0, v1);
+void v3_norm(const v3* a, v3* dst) {
+  f32 len = v3_mag(a);
+  if (len > 0.0f) {
+    dst->x /= len;
+    dst->y /= len;
+    dst->z /= len;
+  }
+}
 
-//   // Clamp the dot product to avoid floating point errors
-//   if (dotProduct < -1.0) dotProduct = -1.0;
-//   if (dotProduct > 1.0) dotProduct = 1.0;
+void v4_norm(const v4* a, v4* dst) {
+  f32 len = v4_mag(a);
+  if (len > 0.0f) {
+    dst->x /= len;
+    dst->y /= len;
+    dst->z /= len;
+    dst->w /= len;
+  }
+}
 
-//   // Compute the angle between the vectors
-//   f32 theta = Math__acosf(dotProduct) * t;
+// spherical linear interpolation
+void v3_slerp(v3* a, v3* b, f32 t, v3* dst) {
+  // normalize the input vectors
+  v3_norm(a, a);
+  v3_norm(b, b);
 
-//   // Compute the orthogonal vector
-//   v3 v2 = {v1.x - v0.x * dotProduct, v1.y - v0.y * dotProduct, v1.z - v0.z * dotProduct};
-//   v2 = v3_norm(&v2);
+  // dot product
+  f32 dp = v3_dot(a, b);
 
-//   // Compute the result
-//   v3 result = {
-//       v0.x * Math__cosf(theta) + v2.x * Math__sinf(theta),
-//       v0.y * Math__cosf(theta) + v2.y * Math__sinf(theta),
-//       v0.z * Math__cosf(theta) + v2.z * Math__sinf(theta)};
+  // clamp the dot product to avoid floating point errors
+  if (dp < -1.0) dp = -1.0;
+  if (dp > 1.0) dp = 1.0;
 
-//   return result;
-// }
+  // angle between the vectors
+  f32 theta = Math__acosf(dp) * t;
+
+  // orthogonal vector
+  dst->x = b->x - a->x * dp;
+  dst->y = b->y - a->y * dp;
+  dst->z = b->z - a->z * dp;
+  v3_norm(dst, dst);
+
+  // result
+  dst->x = a->x * Math__cosf(theta) + dst->x * Math__sinf(theta);
+  dst->y = a->y * Math__cosf(theta) + dst->y * Math__sinf(theta);
+  dst->z = a->z * Math__cosf(theta) + dst->z * Math__sinf(theta);
+}
+
+// left-handed orthographic projection matrix
+// with Z ranging from -1 to 1 (GL convention)
+void m4_ortho(m4* dst, f32 l, f32 r, f32 b, f32 t, f32 znear, f32 zfar) {
+  // TODO:
+}
+
+// left-handed perspective projection matrix
+// with Z ranging from -1 to 1 (GL convention)
+void m4_perspective(m4* dst, f32 fov, f32 aspect, f32 znear, f32 zfar) {
+  f32 f = 1.0f / Math__tanf(fov * 0.5f);  // fov is y-axis only
+  f32 fn = 1.0f / (znear - zfar);
+
+  // clang-format off
+  m4_set4x4(dst,
+    f / aspect, 0.0f, 0.0f, 0.0f,
+    0.0f, f, 0.0f, 0.0f,
+    0.0f, 0.0f, (znear + zfar) * fn, -1.0f,
+    0.0f, 0.0f, 2.0f * znear * zfar * fn, 0.0f
+  );
+  // clang-format on
+}
+
+// quaternions
+
+void q_fromAxis(v3 axis, f32 angle, v4* dst) {
+  // Normalize the axis vector
+  f32 length = Math__sqrtf(axis.x * axis.x + axis.y * axis.y + axis.z * axis.z);
+  if (length < 1e-6f) {  // Avoid division by zero
+    dst->x = dst->y = dst->z = 0.0f, dst->w = 1.0f;  // Identity quaternion
+    return;
+  }
+  f32 invLength = 1.0f / length;
+  axis.x *= invLength;
+  axis.y *= invLength;
+  axis.z *= invLength;
+
+  // Compute sine and cosine of half the angle
+  f32 halfAngle = angle * 0.5f;
+  f32 sinHalfAngle = Math__sinf(halfAngle);
+  f32 cosHalfAngle = Math__cosf(halfAngle);
+
+  // Create the quaternion
+  dst->x = axis.x * sinHalfAngle;
+  dst->y = axis.y * sinHalfAngle;
+  dst->z = axis.z * sinHalfAngle;
+  dst->w = cosHalfAngle;
+}
