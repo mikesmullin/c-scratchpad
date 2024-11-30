@@ -16,6 +16,7 @@
         "src/tests/unit/test003.c",
         "src/tests/unit/test004.c",
         "src/tests/unit/test005.c",
+        "src/tests/unit/test006.c",
         "src/lib/Arena.c",
         "src/lib/Base64.c",
         "src/lib/BehaviorTree.c",
@@ -28,6 +29,7 @@
         "src/lib/Sha1.c",
         "src/lib/String.c",
         "src/lib/Time.c",
+        "src/lib/Thread.c",
         "-o",
         "build/main.exe"
       ],

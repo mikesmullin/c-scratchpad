@@ -21,8 +21,9 @@ typedef double f64;
 #define Math__min(a, b) (((a) < (b)) ? (a) : (b))
 #define Math__max(a, b) (((a) > (b)) ? (a) : (b))
 #define Math__clamp(min, n, max) (((n) < (min)) ? (min) : ((max) < (n)) ? (max) : (n))
-f32 Math__wrapaf(f32 n, f32 x, f32 m, f32 s);
+// f32 Math__map(f32 n, f32 input_start, f32 input_end, f32 output_start, f32 output_end);
 f32 Math__fmodf(f32 n, f32 d);
+f32 Math__wrapaf(f32 n, f32 x, f32 m, f32 s);
 u32 Math__ceil(f32 n);
 u32 Math__floor(f32 n);
 
@@ -588,40 +589,4 @@ void m4_perspective(m4* dst, f32 fov, f32 aspect, f32 znear, f32 zfar);
 // quaternions
 
 void q_fromAxis(v3 axis, f32 angle, v4* dst);
-
-static inline void m4_fromQ(v4* left, m4* dst) {
-  v4* nq = &(v4){0, 0, 0, 0};
-  v4_norm(left, nq);
-
-  f32 XX, YY, ZZ, XY, XZ, YZ, WX, WY, WZ;
-
-  XX = nq->x * nq->x;
-  YY = nq->y * nq->y;
-  ZZ = nq->z * nq->z;
-  XY = nq->x * nq->y;
-  XZ = nq->x * nq->z;
-  YZ = nq->y * nq->z;
-  WX = nq->w * nq->x;
-  WY = nq->w * nq->y;
-  WZ = nq->w * nq->z;
-
-  dst->a.x = 1.0f - 2.0f * (YY + ZZ);
-  dst->a.y = 2.0f * (XY + WZ);
-  dst->a.z = 2.0f * (XZ - WY);
-  dst->a.w = 0.0f;
-
-  dst->b.x = 2.0f * (XY - WZ);
-  dst->b.y = 1.0f - 2.0f * (XX + ZZ);
-  dst->b.z = 2.0f * (YZ + WX);
-  dst->b.w = 0.0f;
-
-  dst->c.x = 2.0f * (XZ + WY);
-  dst->c.y = 2.0f * (YZ - WX);
-  dst->c.z = 1.0f - 2.0f * (XX + YY);
-  dst->c.w = 0.0f;
-
-  dst->d.x = 0.0f;
-  dst->d.y = 0.0f;
-  dst->d.w = 0.0f;
-  dst->d.z = 1.0f;
-}
+void m4_fromQ(v4* left, m4* dst);

@@ -26,6 +26,11 @@ static const f32 NInfinity32 = -1.0f / 0.0f;
 // - perform in constant time, and
 // - are cross-platform compatible
 
+// f32 Math__map(f32 n, f32 input_start, f32 input_end, f32 output_start, f32 output_end) {
+//   f32 range = 1.0 * (output_end - output_start) / (input_end - input_start);
+//   return output_start + range * (n - input_start);
+// }
+
 f32 Math__fmodf(f32 n, f32 d) {
   if (n == 0.0f || d == 0.0f) {
     return 0.0f;  // 0 mod anything is 0
@@ -396,4 +401,41 @@ void q_fromAxis(v3 axis, f32 angle, v4* dst) {
   dst->y = axis.y * sinHalfAngle;
   dst->z = axis.z * sinHalfAngle;
   dst->w = cosHalfAngle;
+}
+
+void m4_fromQ(v4* left, m4* dst) {
+  v4* nq = &(v4){0, 0, 0, 0};
+  v4_norm(left, nq);
+
+  f32 XX, YY, ZZ, XY, XZ, YZ, WX, WY, WZ;
+
+  XX = nq->x * nq->x;
+  YY = nq->y * nq->y;
+  ZZ = nq->z * nq->z;
+  XY = nq->x * nq->y;
+  XZ = nq->x * nq->z;
+  YZ = nq->y * nq->z;
+  WX = nq->w * nq->x;
+  WY = nq->w * nq->y;
+  WZ = nq->w * nq->z;
+
+  dst->a.x = 1.0f - 2.0f * (YY + ZZ);
+  dst->a.y = 2.0f * (XY + WZ);
+  dst->a.z = 2.0f * (XZ - WY);
+  dst->a.w = 0.0f;
+
+  dst->b.x = 2.0f * (XY - WZ);
+  dst->b.y = 1.0f - 2.0f * (XX + ZZ);
+  dst->b.z = 2.0f * (YZ + WX);
+  dst->b.w = 0.0f;
+
+  dst->c.x = 2.0f * (XZ + WY);
+  dst->c.y = 2.0f * (YZ - WX);
+  dst->c.z = 1.0f - 2.0f * (XX + YY);
+  dst->c.w = 0.0f;
+
+  dst->d.x = 0.0f;
+  dst->d.y = 0.0f;
+  dst->d.w = 0.0f;
+  dst->d.z = 1.0f;
 }

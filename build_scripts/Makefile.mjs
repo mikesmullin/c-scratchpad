@@ -30,6 +30,7 @@ const DEBUG_COMPILER_ARGS = [
 ];
 const C_COMPILER_ARGS = [];
 C_COMPILER_ARGS.push('-m64');
+if (!isWin) C_COMPILER_ARGS.push('-pthread');
 const C_COMPILER_INCLUDES = [];
 
 const LINKER_LIBS = [];
